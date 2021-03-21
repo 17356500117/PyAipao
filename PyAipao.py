@@ -131,7 +131,7 @@ def main():
     imeicodes=os.environ['IMEICODE'].split()
     for i in range(0,4):
         try:
-            IMEICode = imeicodes[0]
+            IMEICode = imeicodes[i]
         except KeyError:
             print("未读取到IMEICODE")
             exit(1)
@@ -148,7 +148,7 @@ def main():
             fin = aipaoer.upload_record()
             if(fin.get('msg') == 'success'):
                 ends = fin.get('end')
-                text = "跑步结果-成功"
+                text =aipaoer.userName+ "跑步结果-成功"
             else:
                 ends = "失败"
                 text = "跑步结果-失败"
