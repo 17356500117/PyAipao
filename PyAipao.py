@@ -128,67 +128,71 @@ def weixin_send(SCKEY, body):
 
 
 def main():
-    try:
-        IMEICode = os.environ['IMEICODE']
-    except KeyError:
-        print("未读取到IMEICODE")
-        exit(1)
-
-    try:
-        ZXC = int(os.environ['ZXC'])
-    except KeyError:
-        ZXC = 0
-
-    aipaoer = Aipaoer(IMEICode)
-    if aipaoer.check_imeicode():
-        aipaoer.get_info()
-        aipaoer.get_runId()
-        fin = aipaoer.upload_record()
-        if(fin.get('msg') == 'success'):
-            ends = fin.get('end')
-            text = "跑步结果-成功"
-        else:
-            ends = "失败"
-            text = "跑步结果-失败"
-    else:
-        ends = "IMEICode失效"
-        text = "跑步结果-失败"
-    print(ends)
-    if "成功" in text:
-        web = "\n<a href=\"http://sportsapp.aipao.me/Manage/UserDomain_SNSP_Records.aspx/MyResutls?userId=" + \
-            str(aipaoer.userId)+"\">点我查看跑步历史</a>"
-        ends = ends+web
-    if ZXC == 1:
-        corpid = os.environ['CORPID']
-        corpsecret = os.environ['SECRET']
-        agentid = int(os.environ['AGENTID'])
-        servers = Servers(corpid,
-                          corpsecret, agentid)
-        servers.get_access_token()
-        if servers.send_text(text+'\n'+ends+'\n'):
-            print("企业微信推送成功")
-        else:
-            print("企业微信推送失败")
-            exit(1)
-
-    elif ZXC == 2:
-        body = {
-            "text": text,
-            "desp": ends
-        }
+    imeicodes=os.environ['IMEICODE'].split()
+    for i in range(0,4):
         try:
-            SCKEY = os.environ['SCKEY']
+            IMEICode = imeicodes[0]
         except KeyError:
-            print("SCKEY设置错误")
-            exit(1)
-        if weixin_send(SCKEY, body):
-            print("微信推送成功")
-        else:
-            print("微信推送失败")
+            print("未读取到IMEICODE")
             exit(1)
 
-    if "失败" in text:
-        exit(1)
+        try:
+            ZXC = int(os.environ['ZXC'])
+        except KeyError:
+            ZXC = 0
+
+        aipaoer = Aipaoer(IMEICode)
+        if aipaoer.check_imeicode():
+            aipaoer.get_info()
+            aipaoer.get_runId()
+            fin = aipaoer.upload_record()
+            if(fin.get('msg') == 'success'):
+                ends = fin.get('end')
+                text = "跑步结果-成功"
+            else:
+                ends = "失败"
+                text = "跑步结果-失败"
+        else:
+            ends =aipaoer.userName+"IMEICode失效:"+aipaoer.IMEICode
+            text = "跑步结果-失败"
+        print(ends)
+        if "成功" in text:
+            web = "\n<a href=\"http://sportsapp.aipao.me/Manage/UserDomain_SNSP_Records.aspx/MyResutls?userId=" + \
+                str(aipaoer.userId)+"\">点我查看跑步历史</a>"
+            ends = ends+web
+        if ZXC == 1:
+            corpid = os.environ['CORPID']
+            corpsecret = os.environ['SECRET']
+            agentid = int(os.environ['AGENTID'])
+            servers = Servers(corpid,
+                            corpsecret, agentid)
+            servers.get_access_token()
+            if servers.send_text(text+'\n'+ends+'\n'):
+                print("企业微信推送成功")
+            else:
+                print("企业微信推送失败")
+                exit(1)
+
+        elif ZXC == 2:
+            body = {
+                "text": text,
+                "desp": ends
+            }
+            try:
+                SCKEY = os.environ['SCKEY']
+            except KeyError:
+                print("SCKEY设置错误")
+                exit(1)
+            if weixin_send(SCKEY, body):
+                print("微信推送成功")
+            else:
+                print("微信推送失败")
+                exit(1)
+
+        if "失败" in text:
+            exit(1)
+    
+    
 
 
 if __name__ == "__main__":
