@@ -153,7 +153,7 @@ def main():
                 ends = "失败"
                 text = "跑步结果-失败"
         else:
-            ends ="IMEICode失效:"+aipaoer.IMEICode
+            ends =aipaoer.userName+"IMEICode失效:"+aipaoer.IMEICode
             text = "跑步结果-失败"
         print(ends)
         if "成功" in text:
@@ -190,7 +190,7 @@ def main():
                 exit(1)
 
         if "失败" in text:
-            exit(1)
+            continue
     
     
 
